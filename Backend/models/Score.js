@@ -1,4 +1,4 @@
-const pool = require('./config/database');
+const pool = require('../config/database');
 
 class Score {
   static async create(studentId, subjectId, examScore, continuousAssessment) {
