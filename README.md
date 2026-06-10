@@ -17,7 +17,6 @@
   - [Database Setup](#database-setup)
   - [Running Locally](#running-locally)
 - [API Reference](#api-reference)
-- [Deployment](#deployment)
 - [Default Credentials](#default-credentials)
 - [Grading Scale](#grading-scale)
 - [Submission Details](#submission-details)
@@ -273,8 +272,8 @@ A demo admin account is seeded with the schema:
 
 | Field    | Value             |
 |----------|-------------------|
-| Email    | `admin@test.com`  |
-| Password | `password123`     |
+| Email    | `user@gmail.com`  |
+| Password | `password`    |
 
 
 ---
