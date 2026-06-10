@@ -3,7 +3,7 @@ const bcryptjs = require('bcryptjs');
 
 class User {
   static async create(name, email, password) {
-    const hashedPassword = bcryptjs.hash(password, 10);
+    const hashedPassword = await bcryptjs.hash(password, 10);
 
     const [result] = await pool.execute(
       'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
@@ -48,7 +48,7 @@ class User {
   }
 
   static async verifyPassword(password, hashedPassword) {
-    return bcryptjs.compare(password, hashedPassword);
+    return await bcryptjs.compare(password, hashedPassword);
   }
 }
 
