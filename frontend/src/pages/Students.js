@@ -272,7 +272,7 @@ function Students() {
         ) : filteredStudents.length === 0 ? (
           <div className="loading">{searchTerm ? 'No students match your search.' : 'No students yet — register one above.'}</div>
         ) : (
-          <div className="table-wrapper">
+          <div className="table-wrapper" style={{ position: 'relative' }}>
             <table>
               <thead>
                 <tr>
@@ -307,7 +307,7 @@ function Students() {
       {openMenuId && (
         <div
           className="action-menu"
-          style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left }}
+          style={{ position: 'absolute', top: menuPosition.top, left: menuPosition.left, zIndex: 1000 }}
           onClick={(e) => e.stopPropagation()}
         >
           <button className="action-menu-item" onClick={() => handleView(filteredStudents.find(s => s.id === openMenuId))}>

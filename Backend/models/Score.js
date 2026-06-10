@@ -7,7 +7,7 @@ class Score {
       'SELECT grade FROM grading_scales WHERE min_score <= ? AND max_score >= ? LIMIT 1',
       [totalScore, totalScore]
     );
-    const grade = gradeRows[0]?.grade || 'N/A';
+    const grade = gradeRows[0]?.grade || '-';
     
     const [result] = await pool.execute(
       'INSERT INTO scores (student_id, subject_id, exam_score, continuous_assessment, total_score, grade) VALUES (?, ?, ?, ?, ?, ?)',
@@ -53,7 +53,7 @@ class Score {
       'SELECT grade FROM grading_scales WHERE min_score <= ? AND max_score >= ? LIMIT 1',
       [totalScore, totalScore]
     );
-    const grade = gradeRows[0]?.grade || 'N/A';
+    const grade = gradeRows[0]?.grade || '-';
     
     await pool.execute(
       'UPDATE scores SET exam_score = ?, continuous_assessment = ?, total_score = ?, grade = ? WHERE id = ?',

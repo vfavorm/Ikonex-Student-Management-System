@@ -19,8 +19,8 @@ exports.recordScore = async (req, res) => {
     const isDuplicate = await Score.checkDuplicate(studentId, subjectId);
     if (isDuplicate) return res.status(400).json({ error: 'Score already exists for this student and subject' });
     
-    if (examScore < 0 || examScore > 100 || continuousAssessment < 0 || continuousAssessment > 100) {
-      return res.status(400).json({ error: 'Exam score and continuous assessment must be between 0 and 100' });
+    if (examScore < 0 || examScore > 100 || continuousAssessment < 0) {
+      return res.status(400).json({ error: 'Exam score must be between 0 and 100; continuous assessment must be 0 or above' });
     }
     
     const id = await Score.create(studentId, subjectId, examScore, continuousAssessment);
@@ -82,8 +82,8 @@ exports.updateScore = async (req, res) => {
     const score = await Score.getById(id);
     if (!score) return res.status(404).json({ error: 'Score not found' });
     
-    if (examScore < 0 || examScore > 100 || continuousAssessment < 0 || continuousAssessment > 100) {
-      return res.status(400).json({ error: 'Exam score and continuous assessment must be between 0 and 100' });
+    if (examScore < 0 || examScore > 100 || continuousAssessment < 0) {
+      return res.status(400).json({ error: 'Exam score must be between 0 and 100; continuous assessment must be 0 or above' });
     }
     
     await Score.update(id, examScore, continuousAssessment);

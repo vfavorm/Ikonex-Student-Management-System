@@ -33,7 +33,7 @@ class Result {
         LIMIT 1`,
         [summary.average_score]
       );
-      summary.grade = gradeRows[0]?.grade || 'N/A';
+      summary.grade = gradeRows[0]?.grade || '-';
     }
     
     // Get individual subject scores
@@ -86,7 +86,7 @@ class Result {
           LIMIT 1`,
           [row.average_score]
         );
-        grade = gradeRows[0]?.grade || 'N/A';
+        grade = gradeRows[0]?.grade || '-';
       }
       
       return { ...row, position, grade };

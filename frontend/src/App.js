@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import { useState } from 'react';
 import './App.css';
 import { logout, isAuthenticated } from './services/authService';
 
@@ -12,11 +13,14 @@ import Results from './pages/Results';
 // import ProtectedRoute from './components/ProtectedRoute';
 
 function NavBar() {
+  const [navOpen, setNavOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     window.location.href = '/login';
   };
+
+  const toggleNav = () => setNavOpen(!navOpen);
 
   return (
     <nav className="navbar">
@@ -25,7 +29,12 @@ function NavBar() {
           <span className="material-symbols-outlined brand-icon">school</span>
           <h1>Student Management System</h1>
         </div>
-        <ul className="navbar-links">
+        {/* Toggle button visible on small screens */}
+        <button className="nav-toggle" aria-label="Menu" onClick={toggleNav}>
+          <span className="material-symbols-outlined">more_vert</span>
+        </button>
+        {/* Desktop links */}
+        <ul className="navbar-links desktop">
           <li><NavLink to="/" end>Home</NavLink></li>
           <li><NavLink to="/class-streams">Class Streams</NavLink></li>
           <li><NavLink to="/students">Students</NavLink></li>
@@ -33,6 +42,17 @@ function NavBar() {
           <li><NavLink to="/scores">Scores</NavLink></li>
           <li><NavLink to="/results">Results</NavLink></li>
         </ul>
+        {/* Mobile drawer */}
+        <div className={`nav-drawer ${navOpen ? 'open' : ''}`}>
+          <ul className="navbar-links mobile">
+            <li><NavLink to="/" end onClick={toggleNav}>Home</NavLink></li>
+            <li><NavLink to="/class-streams" onClick={toggleNav}>Class Streams</NavLink></li>
+            <li><NavLink to="/students" onClick={toggleNav}>Students</NavLink></li>
+            <li><NavLink to="/subjects" onClick={toggleNav}>Subjects</NavLink></li>
+            <li><NavLink to="/scores" onClick={toggleNav}>Scores</NavLink></li>
+            <li><NavLink to="/results" onClick={toggleNav}>Results</NavLink></li>
+          </ul>
+        </div>
         <div className="navbar-user">
           {/* <span className="navbar-user-name">{user?.name}</span> */}
           <button onClick={handleLogout} className="btn btn-secondary">

@@ -14,7 +14,7 @@ function Scores() {
     subjectId: '',
     examScore: ''
   });
-  const [caEntries, setCaEntries] = useState([{ label: 'CAT 1', score: '' }]);
+  const [caEntries, setCaEntries] = useState([{ label: 'CAT 1', score: '', outOf: '' }]);
   const [viewingScore, setViewingScore] = useState(null);
   const [editingScore, setEditingScore] = useState(null);
   const [editData, setEditData] = useState({});
@@ -71,11 +71,22 @@ function Scores() {
   };
 
   /* ── CA entry helpers ── */
-  const getCaTotal = (entries) => entries.reduce((sum, e) => sum + (parseFloat(e.score) || 0), 0);
+  // Normalise all CAT entries to a 0-100 percentage, then return it.
+  // Formula: (Σscores / Σmaxes) × 100
+  const getCaPercentage = (entries) => {
+    const totalScore = entries.reduce((s, e) => s + (parseFloat(e.score) || 0), 0);
+    const totalMax   = entries.reduce((s, e) => s + (parseFloat(e.outOf) || 0), 0);
+    if (totalMax === 0) return 0;
+    return Math.round((totalScore / totalMax) * 10000) / 100; // 2 dp
+  };
+
+  // Keep old getCaTotal for display of raw marks
+  const getCaTotal = (entries) => entries.reduce((s, e) => s + (parseFloat(e.score) || 0), 0);
+  const getCaMax   = (entries) => entries.reduce((s, e) => s + (parseFloat(e.outOf) || 0), 0);
 
   const addCaEntry = () => {
     const nextNum = caEntries.length + 1;
-    setCaEntries([...caEntries, { label: `CAT ${nextNum}`, score: '' }]);
+    setCaEntries([...caEntries, { label: `CAT ${nextNum}`, score: '', outOf: '' }]);
   };
 
   const removeCaEntry = (idx) => {
@@ -90,7 +101,7 @@ function Scores() {
   /* ── Edit CA entry helpers ── */
   const addEditCaEntry = () => {
     const nextNum = editCaEntries.length + 1;
-    setEditCaEntries([...editCaEntries, { label: `CAT ${nextNum}`, score: '' }]);
+    setEditCaEntries([...editCaEntries, { label: `CAT ${nextNum}`, score: '', outOf: '' }]);
   };
 
   const removeEditCaEntry = (idx) => {
@@ -104,22 +115,18 @@ function Scores() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const caTotal = getCaTotal(caEntries);
-    if (caTotal > 100) {
-      setError('Total Continuous Assessment cannot exceed 100');
-      return;
-    }
+    const caPercentage = getCaPercentage(caEntries);
     try {
       setError(''); setSuccess('');
       await recordScore(
         formData.studentId,
         formData.subjectId,
         parseFloat(formData.examScore),
-        caTotal
+        caPercentage
       );
       setSuccess('Score recorded successfully');
       setFormData({ studentId: '', subjectId: '', examScore: '' });
-      setCaEntries([{ label: 'CAT 1', score: '' }]);
+      setCaEntries([{ label: 'CAT 1', score: '', outOf: '' }]);
       fetchScores();
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to record score');
@@ -141,19 +148,16 @@ function Scores() {
   const handleOpenEdit = (score) => {
     setEditingScore(score);
     setEditData({ examScore: score.exam_score });
-    setEditCaEntries([{ label: 'Total CA', score: score.continuous_assessment }]);
+    // Represent the stored CA percentage as a single entry (out of 100)
+    setEditCaEntries([{ label: 'Total CA', score: score.continuous_assessment, outOf: '100' }]);
     setOpenMenuId(null);
   };
 
   const handleSaveEdit = async () => {
-    const caTotal = getCaTotal(editCaEntries);
-    if (caTotal > 100) {
-      setError('Total Continuous Assessment cannot exceed 100');
-      return;
-    }
+    const caPercentage = getCaPercentage(editCaEntries);
     try {
       setError(''); setSuccess('');
-      await updateScore(editingScore.id, parseFloat(editData.examScore), caTotal);
+      await updateScore(editingScore.id, parseFloat(editData.examScore), caPercentage);
       setSuccess('Score updated successfully');
       setEditingScore(null);
       fetchScores();
@@ -203,8 +207,12 @@ function Scores() {
     setOpenMenuId(openMenuId === id ? null : id);
   };
 
-  const caTotal = getCaTotal(caEntries);
-  const editCaTotal = getCaTotal(editCaEntries);
+  const caPercentage  = getCaPercentage(caEntries);
+  const caTotal       = getCaTotal(caEntries);
+  const caMax         = getCaMax(caEntries);
+  const editCaPercentage = getCaPercentage(editCaEntries);
+  const editCaTotal      = getCaTotal(editCaEntries);
+  const editCaMax        = getCaMax(editCaEntries);
 
   return (
     <>
@@ -297,8 +305,11 @@ function Scores() {
                 <div style={{ fontSize: 'var(--fs-label)', fontWeight: 600, color: 'var(--on-surface-variant)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                   Continuous Assessment Entries
                 </div>
-                <div style={{ fontSize: 'var(--fs-label)', color: caTotal > 100 ? 'var(--error)' : 'var(--on-surface-variant)', marginTop: 4 }}>
-                  Total: <strong style={{ color: caTotal > 100 ? 'var(--error)' : 'var(--primary-fixed-dim)' }}>{caTotal}</strong> / 100
+                <div style={{ fontSize: 'var(--fs-label)', color: 'var(--on-surface-variant)', marginTop: 4 }}>
+                  Raw total: <strong style={{ color: 'var(--primary-fixed-dim)' }}>{caTotal}</strong>
+                  {caMax > 0 && (
+                    <> / {caMax} &nbsp;·&nbsp; <strong style={{ color: 'var(--primary-fixed-dim)' }}>{caPercentage}%</strong> (used for grading)</>)
+                  }
                 </div>
               </div>
               <button type="button" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: 'var(--fs-label)' }} onClick={addCaEntry}>
@@ -331,13 +342,35 @@ function Scores() {
                     type="number"
                     step="0.01"
                     min="0"
-                    max="100"
+                    max="9999"
                     value={entry.score}
                     onChange={(e) => updateCaEntry(idx, 'score', e.target.value)}
                     placeholder="Score"
                     required
                     style={{
-                      flex: '0 0 100px',
+                      flex: '0 0 90px',
+                      background: 'var(--surface)',
+                      border: '1px solid var(--outline-variant)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '10px 14px',
+                      fontFamily: 'var(--font)',
+                      fontSize: 'var(--fs-body-md)',
+                      color: 'var(--on-surface)',
+                      outline: 'none',
+                    }}
+                  />
+                  <span style={{ color: 'var(--on-surface-variant)', fontSize: 'var(--fs-body-md)', flexShrink: 0 }}>/</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="9999"
+                    value={entry.outOf}
+                    onChange={(e) => updateCaEntry(idx, 'outOf', e.target.value)}
+                    placeholder="Out of"
+                    required
+                    style={{
+                      flex: '0 0 90px',
                       background: 'var(--surface)',
                       border: '1px solid var(--outline-variant)',
                       borderRadius: 'var(--radius-md)',
@@ -551,8 +584,11 @@ function Scores() {
                   <div style={{ fontSize: 'var(--fs-label)', fontWeight: 600, color: 'var(--on-surface-variant)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                     Continuous Assessment Entries
                   </div>
-                  <div style={{ fontSize: 'var(--fs-label)', color: editCaTotal > 100 ? 'var(--error)' : 'var(--on-surface-variant)', marginTop: 4 }}>
-                    Total: <strong style={{ color: editCaTotal > 100 ? 'var(--error)' : 'var(--primary-fixed-dim)' }}>{editCaTotal}</strong> / 100
+                  <div style={{ fontSize: 'var(--fs-label)', color: 'var(--on-surface-variant)', marginTop: 4 }}>
+                    Raw total: <strong style={{ color: 'var(--primary-fixed-dim)' }}>{editCaTotal}</strong>
+                    {editCaMax > 0 && (
+                      <> / {editCaMax} &nbsp;·&nbsp; <strong style={{ color: 'var(--primary-fixed-dim)' }}>{editCaPercentage}%</strong> (used for grading)</>)
+                    }
                   </div>
                 </div>
                 <button type="button" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: 'var(--fs-label)' }} onClick={addEditCaEntry}>
@@ -570,7 +606,7 @@ function Scores() {
                       onChange={(e) => updateEditCaEntry(idx, 'label', e.target.value)}
                       placeholder="Label"
                       style={{
-                        flex: '1 1 140px',
+                        flex: '1 1 120px',
                         background: 'var(--surface)',
                         border: '1px solid var(--outline-variant)',
                         borderRadius: 'var(--radius-md)',
@@ -585,12 +621,33 @@ function Scores() {
                       type="number"
                       step="0.01"
                       min="0"
-                      max="100"
                       value={entry.score}
                       onChange={(e) => updateEditCaEntry(idx, 'score', e.target.value)}
                       placeholder="Score"
+                      required
                       style={{
-                        flex: '0 0 100px',
+                        flex: '0 0 90px',
+                        background: 'var(--surface)',
+                        border: '1px solid var(--outline-variant)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '10px 14px',
+                        fontFamily: 'var(--font)',
+                        fontSize: 'var(--fs-body-md)',
+                        color: 'var(--on-surface)',
+                        outline: 'none',
+                      }}
+                    />
+                    <span style={{ color: 'var(--on-surface-variant)', fontSize: 'var(--fs-body-md)', flexShrink: 0 }}>/</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={entry.outOf}
+                      onChange={(e) => updateEditCaEntry(idx, 'outOf', e.target.value)}
+                      placeholder="Out of"
+                      required
+                      style={{
+                        flex: '0 0 90px',
                         background: 'var(--surface)',
                         border: '1px solid var(--outline-variant)',
                         borderRadius: 'var(--radius-md)',
