@@ -32,13 +32,13 @@ The **Ikonex Student Management System** is a web-based platform built to stream
 
 ## Features
 
-### 🏫 Class Stream Management
+###  Class Stream Management
 - Create class streams (e.g., Form 1A, Form 1B, Form 1C)
 - View all class streams with assigned student counts
 - View details of a single class stream including enrolled students
 - Edit and delete class streams
 
-### 👩‍🎓 Student Management
+###  Student Management
 - Register students and assign them to a class stream
 - Edit student information (name, admission number, class, date of birth)
 - Delete student records
@@ -46,13 +46,13 @@ The **Ikonex Student Management System** is a web-based platform built to stream
 - View all students with search/filter functionality
 - View students belonging to a specific class stream
 
-### 📚 Subject Management
+### Subject Management
 - Create and manage subjects offered by the school (name + code)
 - Assign subjects to specific class streams
 - View all subjects
 - Edit and delete subject information
 
-### 📝 Student Assessment & Scoring
+### Student Assessment & Scoring
 - Record **examination scores** and **continuous assessment (CA)** scores per student per subject
 - Automatic total score calculation (Exam + CA)
 - Auto-assigned grade based on configurable grading scales
@@ -61,18 +61,18 @@ The **Ikonex Student Management System** is a web-based platform built to stream
 - View class-wide performance for a selected subject
 - Duplicate score submission prevention (unique constraint per student–subject pair)
 
-### 📊 Results Processing
+### Results Processing
 - Calculate total marks obtained by each student across all subjects
 - Calculate average scores per student
 - Determine grades based on the configurable grading scale (A–F)
 - Calculate subject positions and overall class positions
 - Automatically rank students within a class stream based on total performance
 
-### 📄 Reporting
+### Reporting
 - Generate an **individual PDF Report Card** for each student showing all subject scores, grades, totals, averages, and class position
 - Generate a **PDF class performance report** summarising all students' results for a selected class stream
 
-### 🔐 Authentication
+### Authentication
 - JWT-based login/logout
 - Protected API routes via middleware
 
@@ -310,13 +310,3 @@ A demo admin account is seeded with the schema:
 
 > The grading scale is stored in the `grading_scales` table and can be updated directly in the database to suit institutional requirements.
 
----
-
-## Submission Details
-
-Submitted to **info@ikonexsystems.com** as part of the Ikonex Academy Takeaway Assignment.
-
-Submission includes:
-- ✅ Git Repository URL
-- ✅ Hosted Application URL
-- ✅ This README as the User Guide (setup, deployment, and system usage)
