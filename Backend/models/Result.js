@@ -71,13 +71,25 @@ class Result {
       ORDER BY total_marks DESC`,
       [classStreamId]
     );
-    
-    // Add position and grade to each student
-    let position = 1;
-    const rankedStudents = await Promise.all(rows.map(async (row, i) => {
-      if (i > 0 && row.total_marks < rows[i - 1].total_marks) position = i + 1;
-      
-      // Get grade based on average score
+
+    // Step 1: assign positions synchronously (rows already sorted by total_marks DESC)
+    const withPositions = [];
+    for (let i = 0; i < rows.length; i++) {
+      let position;
+      if (i === 0) {
+        position = 1;
+      } else if (rows[i].total_marks === rows[i - 1].total_marks) {
+        // Tie: same position as the previous student
+        position = withPositions[i - 1].position;
+      } else {
+        // New position skips over tied slots (e.g. two 2nds → next is 4th)
+        position = i + 1;
+      }
+      withPositions.push({ ...rows[i], position });
+    }
+
+    // Step 2: fetch grades in parallel (positions are already locked in)
+    const rankedStudents = await Promise.all(withPositions.map(async (row) => {
       let grade = 'N/A';
       if (row.average_score) {
         const [gradeRows] = await pool.execute(
@@ -88,10 +100,9 @@ class Result {
         );
         grade = gradeRows[0]?.grade || '-';
       }
-      
-      return { ...row, position, grade };
+      return { ...row, grade };
     }));
-    
+
     return rankedStudents;
   }
 
