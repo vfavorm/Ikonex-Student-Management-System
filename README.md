@@ -19,7 +19,6 @@
 - [API Reference](#api-reference)
 - [Default Credentials](#default-credentials)
 - [Grading Scale](#grading-scale)
-- [Submission Details](#submission-details)
 
 ---
 
