@@ -12,8 +12,7 @@ export const downloadStudentReport = async (studentId) => {
     const response = await api.get(`/results/report/student/${studentId}`, {
       responseType: 'blob'
     });
-    
-    // Create blob link to download
+
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
@@ -21,7 +20,8 @@ export const downloadStudentReport = async (studentId) => {
     document.body.appendChild(link);
     link.click();
     link.parentNode.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    // Delay revoke so the browser has time to start the download
+    setTimeout(() => window.URL.revokeObjectURL(url), 150);
   } catch (error) {
     console.error('Error downloading student report:', error);
     throw error;
@@ -33,8 +33,7 @@ export const downloadClassReport = async (classStreamId) => {
     const response = await api.get(`/results/report/class/${classStreamId}`, {
       responseType: 'blob'
     });
-    
-    // Create blob link to download
+
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
@@ -42,7 +41,8 @@ export const downloadClassReport = async (classStreamId) => {
     document.body.appendChild(link);
     link.click();
     link.parentNode.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    // Delay revoke so the browser has time to start the download
+    setTimeout(() => window.URL.revokeObjectURL(url), 150);
   } catch (error) {
     console.error('Error downloading class report:', error);
     throw error;
