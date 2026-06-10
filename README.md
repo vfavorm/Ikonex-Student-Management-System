@@ -266,24 +266,6 @@ All API routes are prefixed with `/api`.
 | GET    | `/api/results/student/:studentId/pdf` | Download student PDF report card     |
 | GET    | `/api/health`                         | Backend health check                 |
 
----
-
-## Deployment
-
-The application can be deployed on any VPS or platform service:
-
-**Recommended platforms:**
-- **Backend:** [Railway](https://railway.app), [Render](https://render.com), or a VPS (DigitalOcean, AWS EC2)
-- **Frontend:** [Vercel](https://vercel.com) or [Netlify](https://netlify.com)
-- **Database:** [PlanetScale](https://planetscale.com), [Railway MySQL](https://railway.app), or managed MySQL on your VPS
-
-**General steps:**
-1. Push the repository to GitHub
-2. Deploy the backend with your environment variables configured
-3. Update the frontend API base URL to point to your deployed backend
-4. Build and deploy the frontend (`npm run build`)
-
----
 
 ## Default Credentials
 
@@ -294,7 +276,6 @@ A demo admin account is seeded with the schema:
 | Email    | `admin@test.com`  |
 | Password | `password123`     |
 
-> ⚠️ Change these credentials before deploying to a production environment.
 
 ---
 
