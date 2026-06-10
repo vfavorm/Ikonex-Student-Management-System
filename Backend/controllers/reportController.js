@@ -14,7 +14,9 @@ exports.generateStudentReportCard = async (req, res) => {
     if (!student) return res.status(404).json({ error: 'Student not found' });
     
     const studentData = await Result.getStudentSummary(studentId);
-    const scores = await Score.getByStudent(studentId);
+    
+    // Use the subjects array from getStudentSummary which includes subject names
+    const scores = studentData.subjects || [];
     
     const reportsDir = path.join(__dirname, '../reports');
     if (!fs.existsSync(reportsDir)) fs.mkdirSync(reportsDir, { recursive: true });

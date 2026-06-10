@@ -23,6 +23,14 @@ class ClassSubject {
       [classStreamId, subjectId]
     );
   }
+
+  static async getBySubject(subjectId) {
+    const [rows] = await pool.execute(
+      'SELECT cs.id, c.id as class_stream_id, c.name as class_stream_name FROM class_subjects cs JOIN class_streams c ON cs.class_stream_id = c.id WHERE cs.subject_id = ?',
+      [subjectId]
+    );
+    return rows;
+  }
 }
 
 module.exports = ClassSubject;

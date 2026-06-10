@@ -1,5 +1,13 @@
-CREATE DATABASE IF NOT EXISTS student_management;
-USE student_management;
+CREATE DATABASE IF NOT EXISTS ikonex_student_management;
+USE ikonex_student_management;
+
+CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE class_streams (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -62,3 +70,7 @@ INSERT INTO grading_scales (min_score, max_score, grade) VALUES
 (60, 69.99, 'C'),
 (50, 59.99, 'D'),
 (0, 49.99, 'F');
+
+-- Demo user (password: password123, hashed with bcryptjs)
+INSERT INTO users (name, email, password) VALUES
+('Admin User', 'admin@test.com', '$2a$10$HJwkiqzY1HVg99CyxXUVSuDhkTHjFqsP0TFaGJQHdmCnfKhfFQvJi');

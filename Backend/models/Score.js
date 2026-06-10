@@ -2,7 +2,7 @@ const pool = require('../config/database');
 
 class Score {
   static async create(studentId, subjectId, examScore, continuousAssessment) {
-    const totalScore = examScore + continuousAssessment;
+    const totalScore = Math.round(((examScore * 0.7) + (continuousAssessment * 0.3)) * 100) / 100;
     const [gradeRows] = await pool.execute(
       'SELECT grade FROM grading_scales WHERE min_score <= ? AND max_score >= ? LIMIT 1',
       [totalScore, totalScore]
@@ -48,7 +48,7 @@ class Score {
   }
 
   static async update(id, examScore, continuousAssessment) {
-    const totalScore = examScore + continuousAssessment;
+    const totalScore = Math.round(((examScore * 0.7) + (continuousAssessment * 0.3)) * 100) / 100;
     const [gradeRows] = await pool.execute(
       'SELECT grade FROM grading_scales WHERE min_score <= ? AND max_score >= ? LIMIT 1',
       [totalScore, totalScore]

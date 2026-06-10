@@ -8,7 +8,8 @@ exports.createClassStream = async (req, res) => {
     const id = await ClassStream.create(name);
     res.status(201).json({ id, name, message: 'Class stream created successfully' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error creating class stream:', error);
+    res.status(500).json({ error: error.message || 'Database error' });
   }
 };
 
